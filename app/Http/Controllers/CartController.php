@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\CartItem;
 use Carbon\Carbon;
 
 class CartController extends Controller
@@ -23,7 +24,7 @@ class CartController extends Controller
         return view('cart', compact('addresses'));
     }
 
-    public function apiCartProducts (Request $request)
+    public function apiCartProducts(Request $request)
     {
         $ids = explode(',', $request->ids);
 
@@ -32,7 +33,7 @@ class CartController extends Controller
         return response()->json($data);
     }
 
-    public function apiApplyCoupon (Request $request)
+    public function apiApplyCoupon(Request $request)
     {
         $data = Coupon::where('code', $request->code)
             ->whereDate('from_valid', '<=', Carbon::now())
@@ -41,8 +42,21 @@ class CartController extends Controller
                     ->orWhereNull('till_valid');
             })->first();
 
-            abort_if(!$data, 404, 'Invalid or expired coupon code');
+        abort_if(!$data, 404, 'Invalid or expired coupon code');
 
-            return response()->json($data);
+        return response()->json($data);
+    }
+
+    public function addToCart(Request $request)
+    {
+        $productId = $request->input('productId');
+        $qty = $request->input('qty', 1);
+        
+        $cartItem = new CartItem();
+        $cartItem->product_id = $productId;
+        $cartItem->quantity = $qty;
+        $cartItem->save();
+        
+        return response()->json(['message' => 'Product added to cart successfully']);
     }
 }

@@ -15,6 +15,7 @@
         @stack('css')
         <!-- Styles -->
         @vite('resources/css/app.css')
+
     </head>
     <body class="bg-[#FBFBFB]">
         <div class="flex justify-between items-center px-6 md:px-20 mt-4 bg-white shadow py-2">
@@ -282,6 +283,9 @@
                 if(cartItems != null) {
                     document.getElementById('cart_count_badge').textContent = Object.keys(cartItems).length;
                 } 
+
+                console.log(cartItems);
+
             }
 
             cartCount();

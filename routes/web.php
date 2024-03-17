@@ -1,7 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,57 +19,53 @@ use App\Http\Controllers\WishlistController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+// Landing page
+Route::get('/', [HomeController::class, 'index'])->name('landing-page');
+
+// Product routes
+Route::get('/pd/{slug}', [HomeController::class, 'productDetail'])->name('product_detail');
+Route::get('/products', [HomeController::class, 'products'])->name('products');
+
+// Authentication routes
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/signup', [AuthController::class, 'signup'])->name('signup');
+Route::post('/forgot', [AuthController::class, 'forgot'])->name('forgot');
+Route::match(['GET', 'POST'], '/reset', [AuthController::class, 'reset'])->name('reset');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Account routes
+Route::group(['prefix' => 'account'], function () {
+    Route::get('/', [AccountController::class, 'index'])->name('account.index');
+    Route::post('/', [AccountController::class, 'index'])->name('account.index');
+    Route::get('orders/{id}', [AccountController::class, 'showOrder'])->name('order.show');
+    Route::get('address', [AccountController::class, 'newAddress'])->name('address.create');
+    Route::post('address', [AccountController::class, 'newAddress'])->name('address.store');
+    Route::get('address/{id}', [AccountController::class, 'editAddress'])->name('address.edit');
+    Route::put('address/{id}', [AccountController::class, 'editAddress'])->name('address.update');
 });
 
-Route::controller(App\Http\Controllers\HomeController::class)->group(function () {
-    Route::get('/','index')->name('landing-page');
-    Route::get('/pd/{slug}', 'productDetail')->name('product_detail');
-    Route::get('/products', 'products')->name('products');
-});
+// Cart routes
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::get('/cart/products', [CartController::class, 'apiCartProducts']);
+Route::post('/cart/coupon', [CartController::class, 'apiApplyCoupon']);
 
-Route::controller(App\Http\Controllers\AuthController::class)->group(function () {
-    Route::get('/logout','logout')->name('logout');
-    Route::post('/login', 'login')->name('login');
-    Route::post('/signup', 'signup')->name('signup');
-    Route::post('/forgot', 'forgot')->name('forgot');
-    Route::match(['GET','POST'],'/reset', 'reset')->name('reset');
-});
+// Wishlist routes
+Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+Route::post('/wishlist/{id}', [WishlistController::class, 'toggle']);
 
-Route::controller(App\Http\Controllers\AccountController::class)->group(function () {
+// Static pages routes
+Route::view('/about', 'about_us')->name('about-us');
+Route::view('/privacy-policy', 'privacy_policy')->name('privacy-policy');
+Route::view('/terms-conditions', 'terms_conditions')->name('terms-conditions');
 
-    Route::prefix('account')->group(function (){
-        Route::get('orders/{id}', 'showOrder')->name('order.show');
-        Route::get('address', 'newAddress')->name('address.create');
-        Route::post('address', 'newAddress')->name('address.store');
-        Route::get('address/{id}', 'editAddress')->name('address.edit');
-        Route::put('address/{id}', 'editAddress')->name('address.update');
-    });
+// Payment routes
+Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
+Route::post('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
 
-    Route::get('/account','index')->name('account.index');
-    Route::post('/account','index')->name('account.index');
-});
+// Account deletion route
+Route::delete('/account/delete', [AccountController::class, 'deleteAccount'])->name('account.delete');
+// Address deletion route
+Route::delete('/account/address/{id}', [AccountController::class, 'deleteAddress'])->name('address.delete');
 
-Route::controller(App\Http\Controllers\CartController::class)->group(function () {
-    Route::get('/cart','index')->name('cart');
-    Route::get('/cart/products','apiCartProducts');
-    Route::post('/cart/coupon','apiApplyCoupon');
-});
+Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('cart.add');
 
-Route::controller(App\Http\Controllers\WishlistController::class)->group(function () {
-    Route::get('/wishlist', 'index')->name('wishlist');
-    Route::post('/wishlist/{id}', 'toggle');
-});
-
-Route::get('/about', function () {
-    return view('about_us');
-})->name('about-us');
-
-Route::get('/privacy-policy', function () {
-    return view('privacy_policy');
-})->name('privacy-policy');
-
-Route::get('/terms-conditions', function () {
-    return view('terms_conditions');
-})->name('terms-conditions');

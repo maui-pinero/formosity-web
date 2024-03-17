@@ -2,7 +2,8 @@
 
 @push('scripts')
 
-    <script>
+    <script>   
+
         const isCartNotEmpty = () => {
             let items = mCart._getItems();
             return items != null ? Object.keys(items).length : 0;
@@ -77,12 +78,12 @@
                             let qty = mCart.getQty(item.id);
                             html += `<div class="flex gap-4 mb-5">
                                         <div class="bg-gray-100 rounded shadow p-2">
-                                            <img class="w-20" src="${'/storage/'+item.oldest_image.path}" alt="">
+                                            <img class="w-20" src="/storage/${item.oldest_image.path}" alt="">
                                         </div>
                                         <div class="flex flex-col gap-0.5">
                                             <h3 class="text-lg font-medium text-gray-800">${item.title}</h3>
                                             <p class="text-black text-lg">
-                                                ₱<span class="itemPrice">${item.selling_price}</span>x<span class="qty">${qty}</span> = <span class="font-bold">₱<span class="itemTotalPrice">${item.selling_price*qty}</span></span>
+                                                ₱<span class="itemPrice">${item.selling_price}</span> x <span class="qty">${qty}</span> = <span class="font-bold">₱<span class="itemTotalPrice">${item.selling_price*qty}</span></span>
                                             </p>
                                             <div class="flex items-center gap-6">
                                                 <div class="flex items-center justify-center gap-1">
@@ -217,8 +218,11 @@
                     </div>
 
                     @auth
-                        <button type="button" onclick=""
-                            class="mt-3 bg-rose-600 text-white font-bold text-center w-full py-1 rounded shadow">Checkout</button>
+                        <a href="{{route('payment.index')}}">
+                            <button class="mt-3 bg-rose-600 text-white font-bold text-center w-full py-1 rounded shadow">
+                                Checkout
+                            </button>
+                        </a>
                     @else
                         <button type="button" onclick="toggleLoginPopup()"
                             class="mt-3 bg-rose-600 text-white font-bold text-center w-full py-1 rounded shadow">Checkout</button>
@@ -233,9 +237,9 @@
             <h3 class="text-gray-700 text-lg font-medium">Payment Method</h3>
 
             <div class="flex flex-wrap gap-3">
-                <label for="" class="border border-slate-300 rouonded p-2">
+                <label for="" class="border border-rose-500 rouonded p-2">
                     <input type="radio" name="payment_method" id="" class="hidden peer">
-                    <span class="text-gray-400 font-medium uppercase">Stripe</span>
+                    <span class="text-rose-600 font-medium uppercase">Stripe</span>
                 </label>
             </div>
         </div>

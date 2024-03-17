@@ -51,4 +51,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'role' => UserRole::class,
     ];
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
 }

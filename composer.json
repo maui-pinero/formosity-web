@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "braintree/braintree_php": "^6.17",
         "dd4you/dpanel": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
@@ -13,6 +14,7 @@
         "laravel/socialite": "^5.12",
         "laravel/tinker": "^2.8",
         "overtrue/laravel-favorite": "^5.2",
+        "srmklive/paypal": "~3.0",
         "stripe/stripe-php": "^13.13"
     },
     "require-dev": {
@@ -29,7 +31,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+
+        "files": [
+            "app/BraintreeHelper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

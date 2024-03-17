@@ -3,6 +3,34 @@
 @push('scripts')
     <script>
 
+        function confirmDeleteAddress() {
+            if (confirm('Are you sure you want to delete this address? This action cannot be undone.')) {
+                deleteAddress();
+            }
+        }
+
+        function deleteAddress() {
+            fetch('{{ route('address.delete', $data->id) }}', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect to a different page after successful deletion
+                    window.location.href = '{{ route('account.index', ['tab' => 'address']) }}';
+                } else {
+                    console.error('Error deleting address:', response.statusText);
+                    alert('An error occurred while deleting the address. Please try again later.');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting address:', error.message);
+                alert('An error occurred while deleting the address. Please try again later.');
+            });
+        }
+
     </script>
 @endpush
 
@@ -111,6 +139,11 @@
                             <label for="">&nbsp</label>
                             <button
                                 class="bg-rose-500 rounded shadow py-1 text-center w-full text-white uppercase font-medium">Update</button>
+                        </div>
+
+                        <!-- Delete button -->
+                        <div>
+                            <button type="button" onclick="confirmDeleteAddress()" class="bg-red-500 rounded shadow py-1 text-center w-full text-white uppercase font-medium">Delete Address</button>
                         </div>
 
                     </form>

@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\UserAddress;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class AccountController extends Controller
 {
@@ -59,6 +61,23 @@ class AccountController extends Controller
         return view('account', compact('orders','addresses'));
     }
 
+    public function deleteAccount()
+    {
+        $user = Auth::user();
+
+        $addresses = $user->addresses;
+
+        foreach ($addresses as $address) {
+            $address->delete();
+        }
+
+        $user->delete();
+
+        Auth::logout();
+
+        return Redirect::to('/')->withSuccess('Your account has been successfully deleted.');
+    }
+
     // Address ===================================
 
     public function newAddress(Request $request)
@@ -105,7 +124,7 @@ class AccountController extends Controller
     {
         if($request->method() == 'GET')
         {
-            $data = auth()->check() ? UserAddress::find($id) : [];
+            $data = auth()->check() ? UserAddress::find($id) : null;
             return view('edit_address', compact('data'));
         }
 
@@ -144,6 +163,23 @@ class AccountController extends Controller
         if($address->is_default_address) self::setDefaultAddress($address->id);
 
         return redirect()->route('account.index', ['tab' => 'address'])->withSuccess('Delivery address updated.');
+    }
+
+    public function deleteAddress(Request $request, $id)
+    {
+        $address = UserAddress::findOrFail($id);
+
+        if ($request->user()->id !== $address->user_id) {
+            return response()->json([
+                'message' => 'Unauthorized action.'
+            ], 403);
+        }
+
+        $address->delete();
+
+        return response()->json([
+            'message' => 'Address deleted successfully.'
+        ]);
     }
 
     private static function setDefaultAddress($address_id)
