@@ -24,6 +24,43 @@
         @if (request()->tab)
             activeTab("{{ request()->tab }}")
         @endif
+
+        function confirmDelete() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                // If confirmed, proceed with deletion
+                deleteAccount();
+            }
+        }
+
+        // Function to send delete account request to the server
+        function deleteAccount() {
+            // Send a DELETE request to the server using AJAX or fetch API
+            fetch('{{ route('account.delete') }}', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                },
+                // You can include additional data in the request body if needed
+            })
+            .then(response => {
+                // Handle response accordingly
+                if (response.ok) {
+                    // Account deleted successfully
+                    window.location.href = '{{ route('logout') }}'; // Redirect to logout route
+                } else {
+                    // Handle error response
+                    console.error('Error deleting account:', response.statusText);
+                    alert('An error occurred while deleting your account. Please try again later.');
+                }
+            })
+            .catch(error => {
+                // Handle network errors or exceptions
+                console.error('Error deleting account:', error.message);
+                alert('An error occurred while deleting your account. Please try again later.');
+            });
+        }
+
     </script>
 @endpush
 
@@ -84,6 +121,18 @@
                             </div>
 
                         </form>
+
+                        <!-- delete account -->
+                        <form action="{{ route('account.delete') }}" method="POST" class="mt-4">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" onclick="confirmDelete()"
+                                class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Delete Account
+                            </button>
+                        </form>
+                        <!-- delete account end -->
+
                     </section>
                     <!-- my profile end-->
 
